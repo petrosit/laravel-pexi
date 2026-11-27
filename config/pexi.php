@@ -15,5 +15,6 @@ return [
 
     'report_in_tests' => env('PEXI_REPORT_IN_TESTS', false),
 
+    // Leer lassen: dann gilt config('app.version') bzw. die Datei VERSION im Projekt.
     'release' => env('PEXI_RELEASE'),
 ];

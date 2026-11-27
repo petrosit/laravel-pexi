@@ -75,11 +75,34 @@ class ExceptionReporter
             'environment' => $this->app->environment(),
             'php_version' => PHP_VERSION,
             'laravel_version' => $this->app->version(),
-            'release' => config('pexi.release'),
+            'release' => $this->release(),
             'user_identifier' => $this->userIdentifier($request),
             'fingerprint' => $this->fingerprint($exception),
             'context' => $this->context($request),
         ];
+    }
+
+    /**
+     * PEXI_RELEASE wins; otherwise config('app.version'), then a VERSION file
+     * in the project root – so the release follows the app without a manual .env bump.
+     */
+    private function release(): ?string
+    {
+        $release = config('pexi.release') ?: config('app.version');
+
+        if (is_string($release) && $release !== '') {
+            return $release;
+        }
+
+        $versionFile = $this->app->basePath('VERSION');
+
+        if (is_file($versionFile)) {
+            $version = trim((string) file_get_contents($versionFile));
+
+            return $version !== '' ? $version : null;
+        }
+
+        return null;
     }
 
     private function currentRequest(): ?Request
